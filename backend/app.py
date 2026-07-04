@@ -5,8 +5,8 @@ import os
 import database
 from model import SentimentEngine
 
-# Configure Flask app to serve the frontend from the sibling directory
-app = Flask(__name__, static_folder="../frontend", static_url_path="")
+# Configure Flask app to serve the frontend from the root directory
+app = Flask(__name__, static_folder="../", static_url_path="")
 CORS(app)  # Enable Cross-Origin Resource Sharing
 
 # Initialize model engine

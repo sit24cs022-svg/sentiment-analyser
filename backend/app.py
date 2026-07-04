@@ -1,6 +1,11 @@
+import sys
+import os
+
+# Add backend directory to path so relative imports function on Vercel
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
-import os
 
 import database
 from model import SentimentEngine

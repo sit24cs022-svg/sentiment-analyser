@@ -1,7 +1,12 @@
 import sqlite3
 import os
 
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sentiment.db")
+IS_VERCEL = "VERCEL" in os.environ
+
+if IS_VERCEL:
+    DB_PATH = "/tmp/sentiment.db"
+else:
+    DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sentiment.db")
 
 def get_db_connection():
     conn = sqlite3.connect(DB_PATH)

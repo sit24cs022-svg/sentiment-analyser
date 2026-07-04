@@ -5,7 +5,12 @@ from textblob import TextBlob
 from sklearn.linear_model import SGDClassifier
 from sklearn.feature_extraction.text import HashingVectorizer
 
-MODEL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sentiment_classifier.pkl")
+IS_VERCEL = "VERCEL" in os.environ
+
+if IS_VERCEL:
+    MODEL_PATH = "/tmp/sentiment_classifier.pkl"
+else:
+    MODEL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sentiment_classifier.pkl")
 
 # Predefined classes
 CLASSES = ["negative", "neutral", "positive"]

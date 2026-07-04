@@ -1,16 +1,16 @@
 import os
 import pickle
-import numpy as np
 from textblob import TextBlob
 
-# Graceful fallback if scikit-learn is not installed (e.g. in Vercel serverless environment)
+# Graceful fallback if scikit-learn/numpy are not installed (e.g. in Vercel serverless environment)
 try:
+    import numpy as np
     from sklearn.linear_model import SGDClassifier
     from sklearn.feature_extraction.text import HashingVectorizer
     SKLEARN_AVAILABLE = True
 except ImportError:
     SKLEARN_AVAILABLE = False
-    print("Warning: scikit-learn not available. Falling back to TextBlob Lexicon only.")
+    print("Warning: scikit-learn/numpy not available. Falling back to TextBlob Lexicon only.")
 
 IS_VERCEL = "VERCEL" in os.environ
 

@@ -2,8 +2,15 @@ import os
 import pickle
 import numpy as np
 from textblob import TextBlob
-from sklearn.linear_model import SGDClassifier
-from sklearn.feature_extraction.text import HashingVectorizer
+
+# Graceful fallback if scikit-learn is not installed (e.g. in Vercel serverless environment)
+try:
+    from sklearn.linear_model import SGDClassifier
+    from sklearn.feature_extraction.text import HashingVectorizer
+    SKLEARN_AVAILABLE = True
+except ImportError:
+    SKLEARN_AVAILABLE = False
+    print("Warning: scikit-learn not available. Falling back to TextBlob Lexicon only.")
 
 IS_VERCEL = "VERCEL" in os.environ
 
@@ -42,9 +49,13 @@ SEED_DATA = [
 
 class SentimentEngine:
     def __init__(self):
-        self.vectorizer = HashingVectorizer(n_features=2**12, alternate_sign=False)
-        self.classifier = None
-        self.load_or_init_model()
+        if SKLEARN_AVAILABLE:
+            self.vectorizer = HashingVectorizer(n_features=2**12, alternate_sign=False)
+            self.classifier = None
+            self.load_or_init_model()
+        else:
+            self.vectorizer = None
+            self.classifier = None
 
     def load_or_init_model(self):
         """Load the pickled model, or initialize and train it on seed data if it doesn't exist."""
@@ -100,6 +111,8 @@ class SentimentEngine:
 
     def predict_ml(self, text):
         """Analyze sentiment using our SGDClassifier."""
+        if not SKLEARN_AVAILABLE or self.classifier is None:
+            return self.predict_lexicon(text)
         X_vect = self.vectorizer.transform([text])
         probs = self.classifier.predict_proba(X_vect)[0]
         max_idx = np.argmax(probs)
@@ -113,6 +126,10 @@ class SentimentEngine:
             return "neutral", 1.0
             
         lex_sent, lex_conf = self.predict_lexicon(text)
+        
+        if not SKLEARN_AVAILABLE or self.classifier is None:
+            return lex_sent, lex_conf
+            
         ml_sent, ml_conf = self.predict_ml(text)
         
         # If the ML model is highly confident, we trust it.
@@ -126,6 +143,8 @@ class SentimentEngine:
 
     def update_model(self, text, correct_sentiment):
         """Train the classifier on a user correction (Online Learning)."""
+        if not SKLEARN_AVAILABLE or self.classifier is None:
+            return
         if not text.strip() or correct_sentiment not in CLASSES:
             return
             

@@ -1,0 +1,14 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Database and Model Pickles (generated dynamically on launch)
+backend/sentiment.db
+backend/sentiment_classifier.pkl
+
+# IDEs
+.vscode/
+.idea/
+*.swp
